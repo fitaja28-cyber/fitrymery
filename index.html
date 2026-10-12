@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aksara Pustaka — Katalog Novel & Buku</title>
+  <meta name="description" content="Katalog novel dan buku pilihan. Halaman responsif mobile-first dengan Tailwind CSS." />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            ink: '#1c1917',
+            paper: '#faf6ef',
+            cream: '#f3ebdc',
+            gold: { 400: '#e9b949', 500: '#d99a1f', 600: '#b97d0f' },
+            wine: { 500: '#8b2e3f', 600: '#6f2331' },
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===== clamp() untuk typography fluid (Requirement #7) ===== */
+    .fluid-hero   { font-size: clamp(2.25rem, 1.2rem + 5vw, 4.5rem); line-height: 1.05; }
+    .fluid-h2     { font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.75rem); line-height: 1.15; }
+    .fluid-lead   { font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem); line-height: 1.7; }
+    .fluid-card   { font-size: clamp(1rem, 0.95rem + 0.3vw, 1.2rem); line-height: 1.3; }
+    .fluid-small  { font-size: clamp(0.78rem, 0.74rem + 0.2vw, 0.9rem); }
+
+    body { background: #faf6ef; color: #1c1917; }
+
+    /* Latar hero: gradien + pola titik halus */
+    .hero-bg {
+      background:
+        radial-gradient(circle at 15% 20%, rgba(233,185,73,.25), transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(139,46,63,.35), transparent 50%),
+        linear-gradient(135deg, #1c1917 0%, #2b1d1f 100%);
+    }
+    .dots {
+      background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+
+    /* Efek punggung buku pada cover */
+    .spine::before {
+      content: ""; position: absolute; inset: 0 auto 0 0; width: 10px; z-index: 3;
+      background: linear-gradient(to right, rgba(0,0,0,.45), rgba(255,255,255,.18) 55%, transparent);
+    }
+
+    /* Animasi masuk card */
+    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    .rise { animation: rise .55s ease both; }
+
+    @keyframes floaty { 0%,100% { transform: translateY(0) rotate(var(--r)); } 50% { transform: translateY(-12px) rotate(var(--r)); } }
+    .floaty { animation: floaty 6s ease-in-out infinite; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .rise, .floaty { animation: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+
+<body class="font-sans antialiased">
+
+  <!-- ================= NAVBAR RESPONSIF (hamburger di mobile) ================= -->
+  <header class="sticky top-0 z-50 bg-ink/95 backdrop-blur border-b border-white/10">
+    <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Navigasi utama">
+      <div class="flex h-16 items-center justify-between">
+        <a href="#top" class="flex items-center gap-2 text-white">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-gold-500 text-ink">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>
+          <span class="font-serif text-xl font-bold tracking-tight">Aksara<span class="text-gold-400">Pustaka</span></span>
+        </a>
+
+        <!-- Menu desktop -->
+        <ul class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-300">
+          <li><a class="hover:text-gold-400 transition" href="#top">Beranda</a></li>
+          <li><a class="hover:text-gold-400 transition" href="#katalog">Katalog</a></li>
+          <li><a class="hover:text-gold-400 transition" href="#fitur">Keunggulan</a></li>
+          <li><a class="hover:text-gold-400 transition" href="#kontak">Kontak</a></li>
+        </ul>
+
+        <div class="flex items-center gap-2">
+          <button id="cartBtn" class="relative rounded-full p-2 text-stone-200 hover:bg-white/10 transition" aria-label="Keranjang">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+            <span id="cartCount" class="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-gold-500 px-1 text-[11px] font-bold text-ink">0</span>
+          </button>
+
+          <!-- Hamburger (hanya tampil di mobile) -->
+          <button id="menuBtn" class="md:hidden rounded-lg p-2 text-stone-200 hover:bg-white/10 transition" aria-label="Buka menu" aria-expanded="false" aria-controls="mobileMenu">
+            <svg id="iconOpen" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="iconClose" class="hidden h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu mobile -->
+      <ul id="mobileMenu" class="hidden md:hidden pb-4 space-y-1 text-stone-200">
+        <li><a class="block rounded-lg px-3 py-2.5 hover:bg-white/10" href="#top">Beranda</a></li>
+        <li><a class="block rounded-lg px-3 py-2.5 hover:bg-white/10" href="#katalog">Katalog</a></li>
+        <li><a class="block rounded-lg px-3 py-2.5 hover:bg-white/10" href="#fitur">Keunggulan</a></li>
+        <li><a class="block rounded-lg px-3 py-2.5 hover:bg-white/10" href="#kontak">Kontak</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- ================= HERO ================= -->
+    <section class="hero-bg relative overflow-hidden text-white">
+      <div class="dots absolute inset-0"></div>
+      <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 md:py-20 lg:grid-cols-2 lg:px-8 lg:py-28">
+        <div>
+          <span class="inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-gold-400/10 px-3 py-1 fluid-small font-medium text-gold-400">
+            ✦ Koleksi Terbaru 2026
+          </span>
+          <h1 class="fluid-hero mt-5 font-serif font-extrabold">
+            Temukan dunia baru di setiap <em class="font-medium italic text-gold-400">halaman</em>.
+          </h1>
+          <p class="fluid-lead mt-5 max-w-xl text-stone-300">
+            Jelajahi novel pilihan dari romansa hingga fantasi. Harga bersahabat, stok selalu siap, dan dikirim ke seluruh Indonesia.
+          </p>
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="#katalog" class="inline-flex items-center justify-center gap-2 rounded-full bg-gold-500 px-7 py-3 font-semibold text-ink shadow-lg shadow-gold-500/20 transition hover:bg-gold-400 hover:-translate-y-0.5">
+              Jelajahi Katalog
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#fitur" class="inline-flex items-center justify-center rounded-full border border-white/25 px-7 py-3 font-semibold text-white transition hover:bg-white/10">Kenapa Kami?</a>
+          </div>
+          <dl class="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-white/10 pt-6">
+            <div><dt class="fluid-small text-stone-400">Judul</dt><dd class="font-serif text-2xl font-bold">12+</dd></div>
+            <div><dt class="fluid-small text-stone-400">Pembaca</dt><dd class="font-serif text-2xl font-bold">8.4K</dd></div>
+            <div><dt class="fluid-small text-stone-400">Rating</dt><dd class="font-serif text-2xl font-bold text-gold-400">4.8★</dd></div>
+          </dl>
+        </div>
+
+        <!-- Dekorasi tumpukan buku (tampil mulai lg) -->
+        <div class="relative hidden h-[420px] lg:block" aria-hidden="true">
+          <div class="floaty absolute left-4 top-10 h-72 w-48 overflow-hidden rounded-r-xl rounded-l-sm shadow-2xl shadow-black/50 ring-1 ring-white/10 spine bg-stone-700" style="--r:-8deg">
+            <img src="https://picsum.photos/seed/aksara-hero1/400/600" alt="" class="h-full w-full object-cover" loading="lazy" onerror="this.remove()" />
+            <div class="absolute inset-0 bg-gradient-to-t from-wine-600/90 via-wine-600/30 to-transparent"></div>
+          </div>
+          <div class="floaty absolute left-40 top-0 h-80 w-52 overflow-hidden rounded-r-xl rounded-l-sm shadow-2xl shadow-black/50 ring-1 ring-white/10 spine bg-stone-700" style="--r:4deg; animation-delay:-2s">
+            <img src="https://picsum.photos/seed/aksara-hero2/400/600" alt="" class="h-full w-full object-cover" loading="lazy" onerror="this.remove()" />
+            <div class="absolute inset-0 bg-gradient-to-t from-gold-600/90 via-gold-600/20 to-transparent"></div>
+          </div>
+          <div class="floaty absolute right-0 top-24 h-72 w-48 overflow-hidden rounded-r-xl rounded-l-sm shadow-2xl shadow-black/50 ring-1 ring-white/10 spine bg-stone-700" style="--r:10deg; animation-delay:-4s">
+            <img src="https://picsum.photos/seed/aksara-hero3/400/600" alt="" class="h-full w-full object-cover" loading="lazy" onerror="this.remove()" />
+            <div class="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-transparent"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= KATALOG ================= -->
+    <section id="katalog" class="mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+      <div class="mb-8 text-center md:mb-12">
+        <p class="fluid-small font-semibold uppercase tracking-[0.25em] text-wine-500">Katalog Pilihan</p>
+        <h2 class="fluid-h2 mt-2 font-serif font-bold">Bacaan terbaik untuk harimu</h2>
+        <p class="fluid-lead mx-auto mt-3 max-w-2xl text-stone-600">Cari berdasarkan judul atau penulis, saring per genre, lalu urutkan sesuai selera.</p>
+      </div>
+
+      <!-- Toolbar: search + sort + filter -->
+      <div class="mb-8 space-y-4">
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <label class="relative flex-1">
+            <span class="sr-only">Cari buku</span>
+            <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="search" type="search" placeholder="Cari judul atau penulis…" class="w-full rounded-full border border-stone-300 bg-white py-3 pl-12 pr-4 outline-none transition focus:border-gold-500 focus:ring-4 focus:ring-gold-400/20" />
+          </label>
+          <label class="sm:w-60">
+            <span class="sr-only">Urutkan</span>
+            <select id="sort" class="w-full rounded-full border border-stone-300 bg-white px-5 py-3 outline-none transition focus:border-gold-500 focus:ring-4 focus:ring-gold-400/20">
+              <option value="default">Urutkan: Rekomendasi</option>
+              <option value="rating">Rating tertinggi</option>
+              <option value="low">Harga terendah</option>
+              <option value="high">Harga tertinggi</option>
+              <option value="az">Judul A–Z</option>
+            </select>
+          </label>
+        </div>
+        <div id="filters" class="flex flex-wrap justify-center gap-2 sm:justify-start" role="group" aria-label="Filter genre"></div>
+      </div>
+
+      <p id="resultInfo" class="mb-5 fluid-small text-stone-500"></p>
+
+      <!-- GRID RESPONSIF: 1 → 2 → 3 → 4 kolom (Requirement #3) -->
+      <div id="grid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 lg:grid-cols-3 xl:grid-cols-4"></div>
+
+      <div id="empty" class="hidden rounded-2xl border border-dashed border-stone-300 bg-white/60 py-16 text-center">
+        <p class="text-4xl">📚</p>
+        <p class="mt-3 font-serif text-xl font-semibold">Buku tidak ditemukan</p>
+        <p class="fluid-small mt-1 text-stone-500">Coba kata kunci atau genre yang lain.</p>
+      </div>
+    </section>
+
+    <!-- ================= KEUNGGULAN ================= -->
+    <section id="fitur" class="bg-cream">
+      <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
+        <h2 class="fluid-h2 text-center font-serif font-bold">Kenapa belanja di AksaraPustaka?</h2>
+        <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200/70 transition hover:-translate-y-1 hover:shadow-lg">
+            <div class="mb-4 grid h-12 w-12 place-items-center rounded-xl bg-gold-400/20 text-2xl">🚚</div>
+            <h3 class="font-serif text-lg font-semibold">Pengiriman Cepat</h3>
+            <p class="fluid-small mt-1.5 text-stone-600">Dikemas rapi dan dikirim ke seluruh Indonesia.</p>
+          </article>
+          <article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200/70 transition hover:-translate-y-1 hover:shadow-lg">
+            <div class="mb-4 grid h-12 w-12 place-items-center rounded-xl bg-wine-500/10 text-2xl">💰</div>
+            <h3 class="font-serif text-lg font-semibold">Harga Bersahabat</h3>
+            <p class="fluid-small mt-1.5 text-stone-600">Diskon rutin dan promo spesial setiap bulan.</p>
+          </article>
+          <article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200/70 transition hover:-translate-y-1 hover:shadow-lg">
+            <div class="mb-4 grid h-12 w-12 place-items-center rounded-xl bg-gold-400/20 text-2xl">✅</div>
+            <h3 class="font-serif text-lg font-semibold">100% Original</h3>
+            <p class="fluid-small mt-1.5 text-stone-600">Langsung dari penerbit, bukan buku bajakan.</p>
+          </article>
+          <article class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200/70 transition hover:-translate-y-1 hover:shadow-lg">
+            <div class="mb-4 grid h-12 w-12 place-items-center rounded-xl bg-wine-500/10 text-2xl">💬</div>
+            <h3 class="font-serif text-lg font-semibold">Rekomendasi Personal</h3>
+            <p class="fluid-small mt-1.5 text-stone-600">Bingung pilih? Tim kami siap bantu carikan bacaan.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER (Requirement #8) ================= -->
+  <footer id="kontak" class="bg-ink text-stone-300">
+    <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+      <div class="sm:col-span-2 lg:col-span-1">
+        <p class="font-serif text-2xl font-bold text-white">Aksara<span class="text-gold-400">Pustaka</span></p>
+        <p class="fluid-small mt-3 max-w-xs text-stone-400">Toko buku daring untuk para pencinta cerita. Membaca itu perjalanan, kami yang siapkan tiketnya.</p>
+      </div>
+      <div>
+        <h4 class="mb-3 font-semibold text-white">Jelajahi</h4>
+        <ul class="fluid-small space-y-2">
+          <li><a class="hover:text-gold-400" href="#katalog">Katalog</a></li>
+          <li><a class="hover:text-gold-400" href="#fitur">Keunggulan</a></li>
+          <li><a class="hover:text-gold-400" href="#top">Kembali ke atas</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="mb-3 font-semibold text-white">Kontak</h4>
+        <ul class="fluid-small space-y-2">
+          <li>📍 Medan, Sumatera Utara</li>
+          <li>✉️ halo@aksarapustaka.id</li>
+          <li>📞 +62 812-0000-0000</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="mb-3 font-semibold text-white">Newsletter</h4>
+        <form id="newsForm" class="flex gap-2">
+          <input type="email" required placeholder="Email kamu" aria-label="Email" class="min-w-0 flex-1 rounded-full bg-white/10 px-4 py-2.5 text-sm text-white placeholder-stone-500 outline-none ring-1 ring-white/10 focus:ring-gold-400" />
+          <button class="rounded-full bg-gold-500 px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-gold-400">Gabung</button>
+        </form>
+      </div>
+    </div>
+    <div class="border-t border-white/10 py-5 text-center fluid-small text-stone-500">
+      © 2026 AksaraPustaka · Tugas Pemrograman Web — Katalog Produk Responsif
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="pointer-events-none fixed bottom-5 left-1/2 z-[60] -translate-x-1/2 translate-y-24 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white shadow-2xl ring-1 ring-white/10 transition duration-300"></div>
+
+  <script>
+    // ============ DATA BUKU (judul & penulis fiktif) ============
+    const books = [
+      { id: 1,  title: "Senja di Kota Tua",        author: "Nadia Prameswari", genre: "Romansa",      price: 89000,  old: 109000, rating: 4.8, pages: 312, seed: "senja-kota-tua",   tint: "from-wine-600/95 via-wine-600/40",   badge: "Best Seller", blurb: "Dua orang asing bertemu di sudut Kota Tua Jakarta, saat senja dan kenangan sama-sama enggan pergi." },
+      { id: 2,  title: "Laut yang Tak Pernah Tidur", author: "Raka Mahendra",    genre: "Petualangan",  price: 99000,  old: null,   rating: 4.7, pages: 384, seed: "laut-tidur",       tint: "from-sky-900/95 via-sky-800/40",     badge: "Baru",        blurb: "Ekspedisi kapal tua menembus badai demi menemukan pulau yang tak ada di peta mana pun." },
+      { id: 3,  title: "Rumah di Ujung Hujan",     author: "Salsabila Anwar",  genre: "Misteri",      price: 85000,  old: 99000,  rating: 4.5, pages: 276, seed: "rumah-hujan",      tint: "from-slate-900/95 via-slate-800/40", badge: null,          blurb: "Setiap hujan turun, satu pintu di rumah tua itu terbuka sendiri. Siapa yang menunggu di baliknya?" },
+      { id: 4,  title: "Aksara Terakhir",          author: "Dimas Wiratama",   genre: "Fantasi",      price: 119000, old: null,   rating: 4.9, pages: 468, seed: "aksara-terakhir",  tint: "from-violet-900/95 via-violet-800/40", badge: "Best Seller", blurb: "Di dunia di mana kata punya kekuatan, seorang penyalin muda menemukan huruf yang telah dilarang." },
+      { id: 5,  title: "Peta Menuju Pulang",       author: "Laras Kinanti",    genre: "Slice of Life", price: 79000, old: 95000,  rating: 4.6, pages: 238, seed: "peta-pulang",      tint: "from-emerald-900/95 via-emerald-800/40", badge: null,        blurb: "Kisah hangat tentang merantau, rindu masakan ibu, dan arti rumah yang sebenarnya." },
+      { id: 6,  title: "Bisikan dari Lantai Tiga", author: "Yoga Prasetyo",    genre: "Misteri",      price: 92000,  old: null,   rating: 4.4, pages: 298, seed: "lantai-tiga",      tint: "from-zinc-900/95 via-zinc-800/40",   badge: "Baru",        blurb: "Arsip kantor lama menyimpan satu nama yang seharusnya tidak pernah ada dalam daftar karyawan." },
+      { id: 7,  title: "Kopi, Kota, dan Kamu",     author: "Maya Febrianti",   genre: "Romansa",      price: 75000,  old: 89000,  rating: 4.7, pages: 254, seed: "kopi-kota",        tint: "from-amber-900/95 via-amber-800/40", badge: "Diskon",      blurb: "Barista pemalu, pelanggan setia, dan secangkir kopi yang selalu tertulis nama yang salah." },
+      { id: 8,  title: "Kode Merah Jakarta",       author: "Bagas Nugraha",    genre: "Fiksi Ilmiah", price: 105000, old: null,   rating: 4.6, pages: 402, seed: "kode-merah",       tint: "from-red-900/95 via-red-800/40",     badge: null,          blurb: "Tahun 2087, sebuah AI kota memilih berhenti patuh. Satu insinyur punya waktu 24 jam." },
+      { id: 9,  title: "Putri Penjaga Api",        author: "Ayu Kartika Sari", genre: "Fantasi",      price: 115000, old: 135000, rating: 4.8, pages: 440, seed: "penjaga-api",      tint: "from-orange-900/95 via-orange-800/40", badge: "Diskon",    blurb: "Api abadi kerajaan mulai padam, dan hanya pewaris terakhir yang tahu cara menyalakannya kembali." },
+      { id: 10, title: "Filosofi Pagi",            author: "Reza Alamsyah",    genre: "Slice of Life", price: 69000, old: null,   rating: 4.3, pages: 192, seed: "filosofi-pagi",    tint: "from-teal-900/95 via-teal-800/40",   badge: null,          blurb: "Kumpulan esai ringan tentang kebiasaan kecil di pagi hari yang diam-diam mengubah hidup." },
+      { id: 11, title: "Sang Pengelana Waktu",     author: "Hana Oktaviani",   genre: "Fiksi Ilmiah", price: 98000,  old: null,   rating: 4.5, pages: 356, seed: "pengelana-waktu",  tint: "from-indigo-900/95 via-indigo-800/40", badge: "Baru",      blurb: "Setiap lompatan waktu mengambil satu kenangan. Ia hanya punya tiga lompatan tersisa." },
+      { id: 12, title: "Jejak di Tanah Batak",     author: "Hotma Sinaga",     genre: "Petualangan",  price: 89000, old: 99000,  rating: 4.7, pages: 322, seed: "tanah-batak",      tint: "from-lime-900/95 via-lime-800/40",   badge: null,          blurb: "Perjalanan seorang fotografer menyusuri Danau Toba, mencari kisah leluhur yang nyaris terlupakan." },
+    ];
+
+    // Sumber gambar bertingkat: kalau satu gagal dimuat, otomatis coba yang berikutnya
+    const IMG_SOURCES = [
+      b => `https://picsum.photos/seed/${b.seed}/600/800`,
+      b => `https://loremflickr.com/600/800/book,library?lock=${b.id}`,
+      b => `https://placehold.co/600x800/1c1917/e9b949?text=${encodeURIComponent(b.title)}`,
+    ];
+    function imgFail(img) {
+      const next = +img.dataset.i + 1;
+      const b = books.find(x => x.id === +img.dataset.id);
+      if (b && next < IMG_SOURCES.length) {
+        img.dataset.i = next;
+        img.src = IMG_SOURCES[next](b);
+      } else {
+        img.remove(); // semua gagal: tampilan cadangan (pola + ikon buku) tetap terlihat
+      }
+    }
+
+    const rupiah = n => "Rp " + n.toLocaleString("id-ID");
+    const $ = s => document.querySelector(s);
+    const state = { q: "", genre: "Semua", sort: "default", cart: 0 };
+    const genres = ["Semua", ...new Set(books.map(b => b.genre))];
+
+    // ============ FILTER PILLS ============
+    function renderFilters() {
+      $("#filters").innerHTML = genres.map(g => `
+        <button data-genre="${g}" class="rounded-full px-4 py-2 text-sm font-medium transition ${
+          g === state.genre
+            ? "bg-ink text-white shadow"
+            : "bg-white text-stone-700 ring-1 ring-stone-300 hover:ring-gold-500 hover:text-ink"
+        }">${g}</button>`).join("");
+    }
+
+    // ============ BINTANG RATING ============
+    function stars(r) {
+      const full = Math.round(r);
+      return Array.from({ length: 5 }, (_, i) =>
+        `<svg class="h-4 w-4 ${i < full ? "text-gold-500" : "text-stone-300"}" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.5l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L1.4 7.8l6-.8L10 1.5z"/></svg>`
+      ).join("");
+    }
+
+    // ============ CARD PRODUK (gambar + info + harga + tombol) ============
+    function card(b, i) {
+      const badgeColor = b.badge === "Diskon" ? "bg-wine-500 text-white" : b.badge === "Baru" ? "bg-emerald-500 text-white" : "bg-gold-500 text-ink";
+      return `
+      <article class="rise group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/80 transition duration-300 hover:-translate-y-1.5 hover:shadow-xl" style="animation-delay:${Math.min(i, 8) * 60}ms">
+        <!-- Cover -->
+        <div class="relative aspect-[3/4] overflow-hidden bg-stone-800 dots spine">
+          <div class="absolute inset-0 grid place-items-center pb-24 text-7xl opacity-25" aria-hidden="true">📖</div>
+          <img src="${IMG_SOURCES[0](b)}" data-i="0" data-id="${b.id}" onerror="imgFail(this)" alt="Sampul buku ${b.title}" loading="lazy"
+               class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t ${b.tint} to-transparent"></div>
+
+          ${b.badge ? `<span class="absolute left-4 top-3 z-10 rounded-full px-3 py-1 text-xs font-bold shadow ${badgeColor}">${b.badge}</span>` : ""}
+          <button data-wish="${b.id}" aria-label="Simpan ke wishlist" class="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-stone-500 shadow transition hover:scale-110 hover:text-wine-500">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          </button>
+
+          <!-- Judul di atas cover -->
+          <div class="absolute inset-x-0 bottom-0 z-10 p-5 text-white">
+            <div class="mb-3 h-px w-10 bg-gold-400"></div>
+            <h3 class="font-serif text-xl font-bold leading-tight drop-shadow sm:text-2xl">${b.title}</h3>
+            <p class="mt-1 text-xs uppercase tracking-widest text-white/80">${b.author}</p>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="flex flex-1 flex-col p-5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="rounded-full bg-cream px-3 py-1 text-xs font-semibold text-wine-600">${b.genre}</span>
+            <span class="text-xs text-stone-500">${b.pages} hlm</span>
+          </div>
+          <p class="fluid-small mt-3 line-clamp-2 text-stone-600">${b.blurb}</p>
+
+          <div class="mt-3 flex items-center gap-1.5">
+            <div class="flex">${stars(b.rating)}</div>
+            <span class="text-sm font-semibold">${b.rating}</span>
+          </div>
+
+          <div class="mt-auto pt-4">
+            <div class="flex items-end gap-2">
+              <span class="fluid-card font-serif font-bold text-ink">${rupiah(b.price)}</span>
+              ${b.old ? `<span class="pb-0.5 text-sm text-stone-400 line-through">${rupiah(b.old)}</span>` : ""}
+            </div>
+            <button data-add="${b.id}" class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-wine-600 active:scale-[.98]">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+              Tambah ke Keranjang
+            </button>
+          </div>
+        </div>
+      </article>`;
+    }
+
+    // ============ RENDER ============
+    function render() {
+      let list = books.filter(b =>
+        (state.genre === "Semua" || b.genre === state.genre) &&
+        (b.title + " " + b.author).toLowerCase().includes(state.q.toLowerCase())
+      );
+      const sorters = {
+        rating: (a, b) => b.rating - a.rating,
+        low:    (a, b) => a.price - b.price,
+        high:   (a, b) => b.price - a.price,
+        az:     (a, b) => a.title.localeCompare(b.title, "id"),
+      };
+      if (sorters[state.sort]) list.sort(sorters[state.sort]);
+
+      $("#grid").innerHTML = list.map(card).join("");
+      $("#empty").classList.toggle("hidden", list.length > 0);
+      $("#resultInfo").textContent = `Menampilkan ${list.length} dari ${books.length} buku`;
+      renderFilters();
+    }
+
+    // ============ TOAST ============
+    let toastTimer;
+    function toast(msg) {
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.remove("translate-y-24");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.add("translate-y-24"), 2200);
+    }
+
+    // ============ EVENTS ============
+    $("#search").addEventListener("input", e => { state.q = e.target.value; render(); });
+    $("#sort").addEventListener("change", e => { state.sort = e.target.value; render(); });
+
+    $("#filters").addEventListener("click", e => {
+      const btn = e.target.closest("[data-genre]");
+      if (!btn) return;
+      state.genre = btn.dataset.genre;
+      render();
+    });
+
+    $("#grid").addEventListener("click", e => {
+      const add = e.target.closest("[data-add]");
+      const wish = e.target.closest("[data-wish]");
+      if (add) {
+        const b = books.find(x => x.id === +add.dataset.add);
+        state.cart++;
+        $("#cartCount").textContent = state.cart;
+        toast(`“${b.title}” masuk keranjang 🛒`);
+      }
+      if (wish) {
+        const svg = wish.querySelector("svg");
+        const on = svg.getAttribute("fill") === "currentColor";
+        svg.setAttribute("fill", on ? "none" : "currentColor");
+        wish.classList.toggle("text-wine-500", !on);
+        toast(on ? "Dihapus dari wishlist" : "Disimpan ke wishlist ❤️");
+      }
+    });
+
+    $("#cartBtn").addEventListener("click", () =>
+      toast(state.cart ? `${state.cart} buku di keranjang` : "Keranjang masih kosong"));
+
+    // Hamburger
+    const menuBtn = $("#menuBtn"), menu = $("#mobileMenu");
+    menuBtn.addEventListener("click", () => {
+      const open = menu.classList.toggle("hidden") === false;
+      menuBtn.setAttribute("aria-expanded", open);
+      $("#iconOpen").classList.toggle("hidden", open);
+      $("#iconClose").classList.toggle("hidden", !open);
+    });
+    menu.addEventListener("click", e => {
+      if (e.target.tagName === "A") { menu.classList.add("hidden"); menuBtn.setAttribute("aria-expanded", false); $("#iconOpen").classList.remove("hidden"); $("#iconClose").classList.add("hidden"); }
+    });
+
+    $("#newsForm").addEventListener("submit", e => { e.preventDefault(); e.target.reset(); toast("Terima kasih sudah bergabung! 📬"); });
+
+    render();
+  </script>
+</body>
+</html>
